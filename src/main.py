@@ -65,7 +65,7 @@ parser = argparse.ArgumentParser()
 ############################
 print("\n\n\n\ninitial setup")
 parser.add_argument("--dataset", type=str, default="raildelays", choices={"airport_delay_50", "pems_228", "raildelays"})
-
+#TODO fix the argument parsing, when I parse it here I can't add the stuff below like n_epochs (#code_goals)
 args = parser.parse_args()
 
 data_dir = "./data/processed/" + args.dataset + "/"
@@ -128,7 +128,7 @@ parser.add_argument("--kt", type=int, default=3)
 
 # training parameters
 parser.add_argument("--batch_size", type=int, default=100)
-parser.add_argument("--n_epochs", type=int, default=100)
+parser.add_argument("--n_epochs", type=int, default=50)
 parser.add_argument("--save_epoch", type=int, default=10)
 parser.add_argument("--learning_rate", type=int, default=1e-4)
 parser.add_argument("--optimizer", type=str, default="ADAM", choices={"ADAM"})
@@ -200,5 +200,4 @@ optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
 if __name__ == "__main__":
     with writer.as_default():
         print("\n\n\n\ntraining loop")
-        model_train(data_train, data_val, output_stats, Lk, model, optimizer, loss_criterion, writer, args)
-        # model_test(data_test, model)
+        model_train(data_train, data_val, data_test, output_stats, Lk, model, optimizer, loss_criterion, writer, args, ckpt_dir)

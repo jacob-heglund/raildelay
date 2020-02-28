@@ -26,15 +26,15 @@ def evaluation(y, y_hat, output_stats):
     '''
     #TODO what's the multi-step case?
 
-    #TODO this only works for the case of 1 output feature 
+    #TODO this only works for the case of 1 output feature
     # single_step case
     v = z_score_inverse(y, output_stats["mean"], output_stats["std"]).numpy().squeeze()
     v_hat = z_score_inverse(y_hat, output_stats["mean"], output_stats["std"]).numpy().squeeze()
-    mape = MAPE(v, v_hat)
+    # mape = MAPE(v, v_hat)
     rmse = mean_squared_error(v, v_hat, squared = False)
     mae = mean_absolute_error(v, v_hat)
-    
-    return mape, rmse, mae
+
+    return rmse, mae
 
 
 def MAPE(y, y_hat):

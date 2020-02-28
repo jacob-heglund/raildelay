@@ -21,7 +21,7 @@ from utils.utils import z_score
 ############################
 
 
-#TODO docs
+#TODO docs (#code_goals)
 def data_interface(data_dir,
                     dataset,
                     n_nodes,
@@ -40,7 +40,7 @@ def data_interface(data_dir,
                     approx,
                     device)
 
-    #TODO use as the interface to pull out the featurse
+    #TODO use as the interface to pull out the features (#code_goals)
     features = ["arr_delay", "scheduled_flights"]
     labels = "arr_delay"
     if dataset == "airport_delay_50":
@@ -61,7 +61,7 @@ def data_interface(data_dir,
     return Lk, data_train, data_test, data_val, output_stats
 
 
-#TODO docs
+#TODO docs (#code_goals)
 def create_output_stats(df, cols):
     output_stats = np.zeros((2, len(cols)))
     for i in range(len(cols)):
@@ -73,11 +73,11 @@ def create_output_stats(df, cols):
     return output_stats
 
 
-#TODO docs
+#TODO docs (#code_goals)
 def process_data(data_dir, dataset, feature_cols, n_nodes):
     df_data = pd.read_pickle(data_dir + "enriched")
 
-    # process database to form numpy database
+    # process database to from numpy database
     if not os.path.exists(data_dir + "dataset.npy"):
         date_list = df_data["datetime"].unique()
         n_timesteps = len(date_list)
@@ -88,7 +88,7 @@ def process_data(data_dir, dataset, feature_cols, n_nodes):
                     "day_of_year_sin", "hour_of_data", "hour_of_day_cos", "hour_of_day_sin"]
         df_data = df_data.drop(labels=drop_list_1, axis=1)
 
-        #TODO be able to reverse this process and assign predictions to specific airports
+        #TODO be able to reverse this process and assign predictions to specific airports (simple, just use a dict like raildelays) (#code_goals)
         # drop everything except feature_cols
         drop_list_2 = ["datetime", "origin_airport_code"]
 
@@ -140,7 +140,7 @@ def sequence_data(data_dir, dataset_name, n_nodes, n_timesteps_per_day, n_timest
         n_features_in = 1
 
     elif dataset_name == "raildelays":
-        dataset = np.load(data_dir + "raildelays.npy")
+        dataset = np.load(data_dir + "dataset.npy")
         n_features_in = 1
 
     n_days = int(np.shape(dataset)[0] / n_timesteps_per_day)
@@ -209,11 +209,11 @@ def split_data(dataset_seq, n_timesteps_in, inf_mode, percent_train=0.7, percent
     test_input, test_label = generate_input_label(dataset_test, n_timesteps_in, inf_mode)
     val_input, val_label = generate_input_label(dataset_val, n_timesteps_in, inf_mode)
 
-    #TODO only works for 1 output feature
+    #TODO only works for 1 output feature (#code_goals)
     output_data = np.vstack((train_label, test_label, val_label))
     output_stats = {"mean":np.mean(output_data), "std":np.std(output_data)}
 
-    #TODO this is fucked, you can't use the hourly delay z-score to normalize the fucking # of flights!
+    #TODO you can't use the mean, std of one feature to normalize other features! (#code_goals)
     train_input = z_score(train_input, output_stats["mean"], output_stats["std"])
     train_label = z_score(train_label, output_stats["mean"], output_stats["std"])
     test_input = z_score(test_input, output_stats["mean"], output_stats["std"])
@@ -228,14 +228,14 @@ def split_data(dataset_seq, n_timesteps_in, inf_mode, percent_train=0.7, percent
     return data_train, data_test, data_val, output_stats
 
 
-#TODO docs
+#TODO docs (#code_goals)
 def generate_input_label(dataset, n_timesteps_in, inf_mode):
     data_input = torch.from_numpy(dataset[:, 0:n_timesteps_in, :, :]).double()
     if inf_mode == "individual":
-        #TODO this is where the output label is chosen
+        #TODO this is where the output feature is chosen for now (#code_goals)
         data_label = torch.from_numpy(dataset[:, -1, :, 0]).double().unsqueeze(1)
     elif inf_mode == "multiple":
-        #TODO this is where the output label is being chose right now
+        #TODO this is where the output feature is chosen for now (#code_goals)
         data_label = torch.from_numpy(dataset[:, n_timesteps_in:, :, 0]).double()
     # standardize to 4 dimensional tensor
     if len(data_label == 3):
@@ -244,7 +244,7 @@ def generate_input_label(dataset, n_timesteps_in, inf_mode):
     return data_input, data_label
 
 
-#TODO docs
+#TODO docs (#code_goals)
 def process_adjacency(data_dir, dataset, ks, n_nodes, approx, device):
     if dataset == "airport_delay_50":
         A = np.load(data_dir + "adj_matrix.npy")
@@ -252,7 +252,7 @@ def process_adjacency(data_dir, dataset, ks, n_nodes, approx, device):
         A = pd.read_csv(data_dir + "W_228.csv", header=None).values
         A = weight_matrix(A)
     elif dataset == "raildelays":
-        A = np.load(data_dir + "raildelays_adj.npy")
+        A = np.load(data_dir + "adj.npy")
 
     L = scaled_laplacian(A)
     if approx == "cheb_poly":
@@ -264,7 +264,7 @@ def process_adjacency(data_dir, dataset, ks, n_nodes, approx, device):
     return Lk
 
 
-# copied from the original paper's implementation
+# copied from the original paper's implementation (which paper? #code_goals)
 def scaled_laplacian(W):
     '''
     Normalized graph Laplacian function.
@@ -285,7 +285,7 @@ def scaled_laplacian(W):
     return np.mat(2 * L / lambda_max - np.identity(n))
 
 
-# copied from the original paper's implementation
+# copied from the original paper's implementation (which paper? #code_goals)
 def cheb_poly_approx(L, Ks, n):
     '''
     Chebyshev polynomials approximation function.
@@ -310,7 +310,7 @@ def cheb_poly_approx(L, Ks, n):
         raise ValueError("ERROR: the size of spatial kernel must be greater than 1, but received {}".format(Ks))
 
 
-# copied from the original paper's implementation
+# copied from the original paper's implementation (which paper? #code_goals)
 def first_approx(W, n):
     '''
     1st-order approximation function.
@@ -325,7 +325,7 @@ def first_approx(W, n):
     return np.mat(np.identity(n) + sinvD * A * sinvD)
 
 
-# copied from the original paper's implementation
+# copied from the original paper's implementation (which paper? #code_goals)
 def weight_matrix(W, sigma2=0.1, epsilon=0.5, scaling=True):
     '''
     Load weight matrix function.

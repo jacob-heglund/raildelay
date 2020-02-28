@@ -1,13 +1,16 @@
 #######################################
 # TODO
 # Big Stuff
+# code_goals
+## remove the if dataset== blah statements in data processing, everything will be in separate notebooks
+##  and only 1 dataset will be processed at a time
 
 # fix the data preprocessing
-## you can't use the hourly delay z-score to normalize the  # of flights!
+## this will be fixed as part of the #code_goals update
 
 # improve training speed
 ## removing as many permute and contiguous commands improved by 3-4%%, we need an order of magnitude improvement
-## look at Pytorch STGCN, see how he did it
+## look at Pytorch STGCN, see how they did it
 ## my model is using tons of memory that the other implementations don't, what's up with that?
 
 # other stuff for a finalized version of the model
@@ -15,12 +18,13 @@
 ## save best models
 
 # data pipeline cleanup
+## this will be fixed as part of the #code_goals update
 ## integrate section 5 into the architecture
 ## integrate adjacency matrix calculation data preprocessing, make it more efficient
 
 #######################################
-#TODO implement later
 # multiple output features
+## this can be included as part of the #code_goals update
 # parser.add_argument("n_features_out", type=int, default=1)
 ## as part of data preprocessing, add singleton dimension, be careful of what features you're selecting (need to know column ordering from notebook)
 
@@ -48,10 +52,9 @@ from models.model import STGCN
 from models.model_train import model_train, model_test
 from data.data_processing import data_interface
 
-#TODO do this better when you integrate code with the delayprediction repo structure
 # base_dir = r"C:\home\dev\research\delayprediction\delayprediction\models\stgcn_dev\miso"
 # base_dir = r"/home/jacobheglund/dev/miso"
-base_dir = r"/home/jacobheglund/dev/raildelays"
+base_dir = r"/home/jacobheglund/dev/raildelay"
 os.chdir(base_dir)
 print(os.getcwd())
 
@@ -74,17 +77,7 @@ Path(ckpt_dir).mkdir(parents=True, exist_ok=True)
 
 writer = tf.summary.create_file_writer(log_dir)
 
-#TODO this is the fundamental information that the model needs in order to set up properly for a particular dataset
-## if there is a way to pass this information from a notebook to this model, then the data preprocessing should be done in a notebook
-## just so that it is all together in one place
-## right now it's kinda split into two places, which is fine for development, but in the end we need ONE place with the data preprocessing
-## this should manifest itself as a notebook with sections for different data processing that each dataset requires
-
-# [data preprocessing] -> [model code], two COMPLETELY SEPARATE sets of code
-
-#TODO these should not be
-#TODO this is not the right setup for top_30 airports!
-
+#TODO this is not the right setup for top_30 airports! (#code_goals)
 if args.dataset == "airport_delay_50":
     n_nodes = 50
     n_timesteps_per_day = 20
@@ -94,7 +87,7 @@ if args.dataset == "airport_delay_50":
     n_features_in = 2
     n_features_out = 1
 
-#TODO make sure this setup replicates the original paper
+#TODO make sure this setup replicates the original paper (#code_goals)
 elif args.dataset == "pems_228":
     n_nodes = 228
     n_timesteps_per_day = 288
@@ -105,8 +98,8 @@ elif args.dataset == "pems_228":
     n_features_out = 1
 
 elif args.dataset == "raildelays":
-    n_nodes = 44
-    n_timesteps_per_day = 15
+    n_nodes = 40
+    n_timesteps_per_day = 42
     n_timesteps_in = 4
     n_timesteps_future = 1
     inf_mode = "individual"
@@ -163,6 +156,10 @@ else:
 ############################
 # data interface
 ############################
+#TODO none of this should be done here for "in-house" code, put this in a notebook #code_goals
+## it should be here for published code (i.e. public facing for other researchers), but that's
+## not what i'm working on right now
+
 print("\n\n\n\nload from disk: dataset={}".format(args.dataset))
 
 Lk, data_train, data_test, data_val, output_stats = data_interface(data_dir,
@@ -176,8 +173,8 @@ Lk, data_train, data_test, data_val, output_stats = data_interface(data_dir,
                                                     args.n_timesteps_in,
                                                     args.n_timesteps_future)
 
-print(output_stats["mean"])
-print(output_stats["std"])
+# print(output_stats["mean"])
+# print(output_stats["std"])
 ############################
 # training setup
 ############################

@@ -18,7 +18,7 @@ from utils.utils import evaluation
 ############################
 
 
-def model_train(data_train, data_val, data_test, output_stats, graph_kernel, model, optimizer, loss_criterion, writer, args, ckpt_dir):
+def model_train(data_train, data_val, data_test, output_stats, graph_kernel, model, optimizer, scheduler, loss_criterion, writer, args, ckpt_dir):
     # randomize and batch data
     # make input to STGCN X.shape = (batch_size, c_in, n_timesteps_in, n_nodes)
     # TODO specify this size in the model docs (#code_goals)
@@ -85,8 +85,9 @@ def model_train(data_train, data_val, data_test, output_stats, graph_kernel, mod
             rmse /= batch_count
             mae /= batch_count
 
-            print("RMSE (validation): ", rmse)
+
             print("MAE (validation): ", mae)
+            print("RMSE (validation): ", rmse)
             print("Inference Time: {} sec".format(round(time.time() - start_time, 2)))
             if rmse < best_metrics[0] and mae < best_metrics[1]:
                 best_metrics[0] = rmse
@@ -98,8 +99,8 @@ def model_train(data_train, data_val, data_test, output_stats, graph_kernel, mod
 
             # record metrics
             # tf.summary.scalar("Mean Absolute Percentage Error", mape, epoch)
-            tf.summary.scalar("Root Mean Squared Error (validation)", rmse, epoch)
-            tf.summary.scalar("Mean Absolute Error (validation)", mae, epoch)
+            # tf.summary.scalar("Root Mean Squared Error (validation)", rmse, epoch)
+            # tf.summary.scalar("Mean Absolute Error (validation)", mae, epoch)
             writer.flush()
 
             # testing
@@ -109,11 +110,12 @@ def model_train(data_train, data_val, data_test, output_stats, graph_kernel, mod
             test_model.to(args.device)
             model_test(data_test, output_stats, graph_kernel, test_model, writer, args, epoch)
 
+            scheduler.step()
+
     return fp_optimized_params
 
 
 def model_test(data_test, output_stats, graph_kernel, model, writer, args, epoch):
-    print("\nTesting")
     test_input, test_label = data_test
     test_input, test_label = test_input.permute(0, 3, 1, 2), test_label.permute(0, 3, 1, 2)
     test_idx = np.arange(0, test_input.shape[0], 1)
@@ -141,8 +143,8 @@ def model_test(data_test, output_stats, graph_kernel, model, writer, args, epoch
         rmse /= batch_count
         mae /= batch_count
 
-        print("RMSE (testing): ", rmse)
         print("MAE (testing): ", mae)
+        print("RMSE (testing): ", rmse)
         print("Inference Time: {} sec".format(round(time.time() - start_time, 2)))
 
         tf.summary.scalar("Root Mean Squared Error (testing)", rmse, epoch)

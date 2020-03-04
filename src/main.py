@@ -58,7 +58,7 @@ base_dir = r"/home/jacobheglund/dev/raildelay"
 os.chdir(base_dir)
 print(os.getcwd())
 
-torch.manual_seed(9)
+# torch.manual_seed(225)
 parser = argparse.ArgumentParser()
 ############################
 # initial setup
@@ -100,8 +100,8 @@ elif args.dataset == "pems_228":
 elif args.dataset == "raildelays":
     n_nodes = 40
     n_timesteps_per_day = 42
-    n_timesteps_in = 4
-    n_timesteps_future = 1
+    n_timesteps_in = 12
+    n_timesteps_future = 6
     inf_mode = "individual"
     n_features_in = 1
     n_features_out = 1
@@ -128,9 +128,8 @@ parser.add_argument("--kt", type=int, default=3)
 
 # training parameters
 parser.add_argument("--batch_size", type=int, default=100)
-parser.add_argument("--n_epochs", type=int, default=50)
-parser.add_argument("--save_epoch", type=int, default=10)
-parser.add_argument("--learning_rate", type=int, default=1e-4)
+parser.add_argument("--n_epochs", type=int, default=25)
+parser.add_argument("--learning_rate", type=int, default=1e-3)
 parser.add_argument("--optimizer", type=str, default="ADAM", choices={"ADAM"})
 parser.add_argument("--drop_prob", type=int, default=0.0)
 
@@ -193,6 +192,7 @@ model = STGCN(blocks,
 
 loss_criterion = nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
+scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10)
 
 ############################
 # training loop
@@ -200,4 +200,4 @@ optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
 if __name__ == "__main__":
     with writer.as_default():
         print("\n\n\n\ntraining loop")
-        model_train(data_train, data_val, data_test, output_stats, Lk, model, optimizer, loss_criterion, writer, args, ckpt_dir)
+        model_train(data_train, data_val, data_test, output_stats, Lk, model, optimizer, scheduler, loss_criterion, writer, args, ckpt_dir)

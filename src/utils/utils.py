@@ -30,7 +30,6 @@ def evaluation(y, y_hat, output_stats):
     # single_step case
     v = z_score_inverse(y, output_stats["mean"], output_stats["std"]).numpy().squeeze()
     v_hat = z_score_inverse(y_hat, output_stats["mean"], output_stats["std"]).numpy().squeeze()
-    # mape = MAPE(v, v_hat)
     rmse = mean_squared_error(v, v_hat, squared = False)
     mae = mean_absolute_error(v, v_hat)
 
@@ -50,7 +49,6 @@ def MAPE(y, y_hat):
     return np.mean(np.abs((y - y_hat) / y + 1e-5)) * 100
 
 
-# copied from the original paper's implementation
 def z_score(x, mean, std):
     '''
     Z-score normalization function: $z = (X - \mu) / \sigma $,
@@ -64,7 +62,6 @@ def z_score(x, mean, std):
     return (x - mean) / std
 
 
-# copied from the original paper's implementation
 def z_score_inverse(x, mean, std):
     '''
     The inverse of function z_score().

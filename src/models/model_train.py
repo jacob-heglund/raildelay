@@ -26,6 +26,8 @@ def model_train(data_train, data_val, data_test, output_stats, graph_kernel, mod
     train_input, train_label = data_train
     train_input, train_label = train_input.permute(0, 3, 1, 2), train_label.permute(0, 3, 1, 2)
 
+    pdb.set_trace()
+
     val_input, val_label = data_val
     val_input, val_label = val_input.permute(0, 3, 1, 2), val_label.permute(0, 3, 1, 2)
 
@@ -151,4 +153,13 @@ def model_test(data_test, output_stats, graph_kernel, model, writer, args, epoch
         tf.summary.scalar("Mean Absolute Error (testing)", mae, epoch)
         writer.flush()
 
+
+def model_inference(data_inf, output_stats, graph_kernel, model, args):
+    # load data to be predicted on
+
+    # data structure to put the predictions into
+
+    # inference w/ trained model
+
+    # save predictions to disk
 

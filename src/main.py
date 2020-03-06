@@ -101,7 +101,7 @@ elif args.dataset == "raildelays":
     n_nodes = 40
     n_timesteps_per_day = 42
     n_timesteps_in = 12
-    n_timesteps_future = 6
+    n_timesteps_future = 1
     inf_mode = "individual"
     n_features_in = 1
     n_features_out = 1
@@ -128,7 +128,8 @@ parser.add_argument("--kt", type=int, default=3)
 
 # training parameters
 parser.add_argument("--batch_size", type=int, default=100)
-parser.add_argument("--n_epochs", type=int, default=25)
+# parser.add_argument("--n_epochs", type=int, default=25)
+parser.add_argument("--n_epochs", type=int, default=2)
 parser.add_argument("--learning_rate", type=int, default=1e-3)
 parser.add_argument("--optimizer", type=str, default="ADAM", choices={"ADAM"})
 parser.add_argument("--drop_prob", type=int, default=0.0)

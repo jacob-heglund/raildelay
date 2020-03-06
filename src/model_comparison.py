@@ -27,9 +27,9 @@ approx = "cheb_poly"
 device = "cuda"
 inf_mode = "individual"
 n_timesteps_per_day = 42
-n_timesteps_in = 12
-n_timesteps_future = 6
-model_type = "MLP"
+n_timesteps_in = 6
+n_timesteps_future = 3
+model_type = "LR"
 
 
 Lk, data_train, data_test, data_val, output_stats = data_interface(data_dir,
@@ -82,14 +82,6 @@ elif model_type == "MLP":
         mae_node.append(err[0])
         rmse_node.append(err[1])
 
-print(model_type)
+print(model_type, "n_past = {}".format(n_timesteps_in), " n_future = {}".format(n_timesteps_future))
 print("MAE", np.mean(mae_node))
 print("RMSE:", np.mean(rmse_node))
-
-# LR
-# MAE 0.30547151399256933
-# RMSE: 0.699626551173839
-
-# MLP
-# MAE 0.34320855
-# RMSE: 0.94689673

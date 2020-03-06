@@ -230,6 +230,6 @@ def model_train(data_train, data_test, model, optimizer, criterion, n_epochs, de
 
             # med_ab_err = median_absolute_error(test_label, y_hat)
             mae = mean_absolute_error(test_label, y_hat)
-            rmse = mean_squared_error(test_label, y_hat)
+            rmse = mean_squared_error(test_label, y_hat, squared=False)
 
     return mae, rmse
